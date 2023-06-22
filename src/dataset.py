@@ -13,7 +13,7 @@ class FedAvgRetriever():
     r"""
     """
 
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: Dict) -> None:
 
         self.config = config
 

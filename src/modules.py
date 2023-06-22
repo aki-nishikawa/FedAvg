@@ -86,24 +86,28 @@ class FedAvgServer():
     def aggregate(self, local_models: List[CNNModel]) -> CNNModel:
         global_model = CNNModel().to(self.config["device"])
 
+        # conv 1
         global_model.conv1.weight.data = torch.zeros_like(
             global_model.conv1.weight.data)
         for local_model in local_models:
             global_model.conv1.weight.data += local_model.conv1.weight.data
         global_model.conv1.weight.data /= len(local_models)
 
+        # conv 2
         global_model.conv2.weight.data = torch.zeros_like(
             global_model.conv2.weight.data)
         for local_model in local_models:
             global_model.conv2.weight.data += local_model.conv2.weight.data
         global_model.conv2.weight.data /= len(local_models)
 
+        # fc1
         global_model.fc1.weight.data = torch.zeros_like(
             global_model.fc1.weight.data)
         for local_model in local_models:
             global_model.fc1.weight.data += local_model.fc1.weight.data
         global_model.fc1.weight.data /= len(local_models)
 
+        # fc2
         global_model.fc2.weight.data = torch.zeros_like(
             global_model.fc2.weight.data)
         for local_model in local_models:
