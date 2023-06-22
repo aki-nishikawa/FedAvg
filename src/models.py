@@ -1,9 +1,9 @@
 import torch.nn as nn
 
 
-class MyModel(nn.Module):
+class CNNModel(nn.Module):
     def __init__(self):
-        super(MyModel, self).__init__()
+        super(CNNModel, self).__init__()
         self.base = nn.Sequential(
             nn.Conv2d(3, 16, 3),
             nn.ReLU(),
