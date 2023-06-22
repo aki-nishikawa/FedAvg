@@ -6,9 +6,13 @@ from src.dataset import FedAvgRetriever
 from src.modules import FedAvgClient, FedAvgServer
 
 config = {
-    "seed": 42,
-    "clients": 5,
+    "batch_size": 128,
+    "device": "cuda:0",
+    "epochs": 1,
+    "learning_rate": 0.0001,
+    "num_clients": 5,
     "rounds": 3,
+    "seed": 42,
 }
 
 
@@ -20,13 +24,13 @@ def main():
     logger.info("FedAvg start")
 
     # init dataset
-    retriever = FedAvgRetriever()
-    dataloaders = retriever.get()
+    retriever = FedAvgRetriever(config)
+    dataloaders = retriever.get(config["num_clients"])
 
     # init server and clients
-    server = FedAvgServer()
-    clients = [FedAvgClient(logger, dataloaders[i])
-               for i in range(config["clients"])]
+    server = FedAvgServer(config)
+    clients = [FedAvgClient(config, dataloaders[i])
+               for i in range(config["num_clients"])]
 
     # init FedAvg
     global_model = server.init_global_model()
