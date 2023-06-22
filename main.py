@@ -8,10 +8,10 @@ from src.modules import FedAvgClient, FedAvgServer
 config = {
     "batch_size": 128,
     "device": "cuda:0",
-    "epochs": 1,
+    "epochs": 5,
     "learning_rate": 0.0001,
     "num_clients": 5,
-    "rounds": 3,
+    "rounds": 5,
     "seed": 42,
 }
 

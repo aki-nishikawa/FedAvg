@@ -1,3 +1,4 @@
+import copy
 from typing import Dict, List
 
 import torch
@@ -21,7 +22,7 @@ class FedAvgClient():
 
     def set_global_model(self, global_model: CNNModel):
         del self.model
-        self.model = global_model
+        self.model = copy.deepcopy(global_model)
 
     def train_local_model(self) -> CNNModel:
         criterion = nn.CrossEntropyLoss()
@@ -57,7 +58,7 @@ class FedAvgClient():
             labels = torch.cat(labels, dim=0)
             preds = torch.cat(preds, dim=0).argmax(1)
             acc = torch.sum(preds == labels) / len(labels)
-            return running_loss / len(self.test_loader), acc
+            return running_loss / len(self.test_loader), acc.item()
 
         self.model.to(self.config["device"])
         for epoch in range(self.config["epochs"]):
@@ -65,6 +66,8 @@ class FedAvgClient():
             train_loss = _train_loop()
             self.model.eval()
             test_loss, acc = _test_loop()
+
+            print(train_loss, test_loss, acc)
 
         return self.model
 
@@ -87,20 +90,24 @@ class FedAvgServer():
             global_model.conv1.weight.data)
         for local_model in local_models:
             global_model.conv1.weight.data += local_model.conv1.weight.data
+        global_model.conv1.weight.data /= len(local_models)
 
         global_model.conv2.weight.data = torch.zeros_like(
             global_model.conv2.weight.data)
         for local_model in local_models:
             global_model.conv2.weight.data += local_model.conv2.weight.data
+        global_model.conv2.weight.data /= len(local_models)
 
         global_model.fc1.weight.data = torch.zeros_like(
             global_model.fc1.weight.data)
         for local_model in local_models:
             global_model.fc1.weight.data += local_model.fc1.weight.data
+        global_model.fc1.weight.data /= len(local_models)
 
         global_model.fc2.weight.data = torch.zeros_like(
             global_model.fc2.weight.data)
         for local_model in local_models:
             global_model.fc2.weight.data += local_model.fc2.weight.data
+        global_model.fc2.weight.data /= len(local_models)
 
         return global_model
